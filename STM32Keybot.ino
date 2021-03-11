@@ -1,3 +1,4 @@
+//
 //                 0     1     2     3     4    5    6   7    8    9    10    11    12   13   14   15   16   17    18    19   20   21   22   23
 int KBPinMap[] = {PB12, PB13, PB14, PB15, PA8, PA4, PA3, PA2, PA1, PA0, PC15, PC14, PB5, PB6, PB7, PB8, PB9, PB11, PB10, PB0, PB1, PA7, PA6, PA5};
 int KBScan[24] = {0};
@@ -13,16 +14,10 @@ void ScanPin(int KBPinMapNum) {
   for (int i = 0; i < sizeof(KBPinMap) / sizeof(KBPinMap[0]); i++) {
     if (i == KBPinMapNum) continue; //跳过探针引脚
     if (digitalRead(KBPinMap[i])) {
-      sprintf(printBuffer, "[%d->%d]", KBPinMapNum, i);
-      Serial1.println(printBuffer);
       KBScan[i] = 1;
-    }
-    /*
-      if (analogRead(KBPinMap[i]) > 4000) {
-      sprintf(printBuffer, "[%d->%d]:%d  ", KBPinMapNum, i, analogRead(KBPinMap[i]));
+      sprintf(printBuffer, "探针[%d]:%d  ->  接收[%d]:%d", KBPinMapNum, KBPinMap[KBPinMapNum], i, KBScan[i]);
       Serial1.println(printBuffer);
-      }
-    */
+    }
   }
 }
 
@@ -62,7 +57,7 @@ void setup() {
   Serial1.println("                                                                    ,|OOOO@@@@@@@@@@@@@@@@@@@@@@@@O    ");
   Serial1.println("     西欧有意法                                             ]|OOO@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@O     ");
   Serial1.println("     中国有航顺                                     ]]OOO@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@OOOO[      ");
-  Serial1.println("     航顺 M C U                             ,]]OO@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@OOO|[`              ");
+  Serial1.println("     航顺半导体                             ,]]OO@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@OOO|[`              ");
   Serial1.println("                                     ,]|OOO@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@OOO|[[                       ");
   Serial1.println("                               ,]|OO@@@@@@@@@@@@@@@@@@@@@@@@@@@@@OOOO[[               ]]]OO@@@O        ");
   Serial1.println("                          ,|O@@@@@@@@@@@@@@@@@@@@@@@@@@@OOOO[`               ]]]O@@@@@@@@@@@@O`        ");
