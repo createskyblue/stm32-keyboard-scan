@@ -8,18 +8,28 @@ void ScanPin(int KBPinMapNum) {
   //设置探针引脚输出
   pinMode(KBPinMap[KBPinMapNum], OUTPUT);
   digitalWrite(KBPinMap[KBPinMapNum], HIGH);
-  delay(5);
   //轮询引脚，是否有输出电平
   char printBuffer[50];
   for (int i = 0; i < sizeof(KBPinMap) / sizeof(KBPinMap[0]); i++) {
     if (i == KBPinMapNum) continue; //跳过探针引脚
-    if (analogRead(KBPinMap[i]) > 4000) KBScan[i] = 1;
+    if (digitalRead(KBPinMap[i])) {
+      sprintf(printBuffer, "[%d->%d]", KBPinMapNum, i);
+      Serial1.println(printBuffer);
+      KBScan[i] = 1;
+    }
     /*
       if (analogRead(KBPinMap[i]) > 4000) {
       sprintf(printBuffer, "[%d->%d]:%d  ", KBPinMapNum, i, analogRead(KBPinMap[i]));
       Serial1.println(printBuffer);
       }
     */
+  }
+}
+
+void AllPinOut() {
+  for (int i = 0; i < sizeof(KBPinMap) / sizeof(KBPinMap[0]); i++) {
+    pinMode(KBPinMap[i], OUTPUT);
+    digitalWrite(KBPinMap[i], HIGH);
   }
 }
 
@@ -79,13 +89,16 @@ void setup() {
   Serial1.println("                           ,[[[|OOOOO@@@@@@@@@@@@@@@@@@@@@@@OOOOOO|[`                                  ");
 
   AllPinIN();
+  //AllPinOut();
 }
 
 void loop() {
+
   ClearKBScan();
 
   for (int i = 0; i < sizeof(KBPinMap) / sizeof(KBPinMap[0]); i++)
     ScanPin(i);
 
-  SerialPrintAllKBScan();
+  //SerialPrintAllKBScan();
+
 }
