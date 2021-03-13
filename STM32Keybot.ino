@@ -3,6 +3,8 @@
 	(x) = (y) - (x); \
 	(y) = (y) - (x);
 
+//按键映射表，按需修改
+//{探针id,接收id,ASCII}
 byte KeyMap[][3]={
   {5,19,'1'},
   {5,18,'2'},
@@ -35,11 +37,20 @@ byte KeyMap[][3]={
   {11,21,'/'},
 };
 
-//
+//KBPinMap 按照键盘排线接入开发板的顺序填写引脚设定
 //                 0     1     2     3     4    5    6   7    8    9    10    11    12   13   14   15   16   17    18    19   20   21   22   23
 int KBPinMap[] = {PB12, PB13, PB14, PB15, PC13, PA4, PA3, PA2, PA1, PA0, PC15, PC14, PB5, PB6, PB7, PB8, PB9, PB11, PB10, PB0, PB1, PA7, PA6, PA5};
-int KBScan[24] = {0};
+int KBScan[] = {0};
 
+/*
+    @函数 ScanKeyMap
+    @作用   搜索按键映射表并输出按键映射
+    @传入
+        byte a 探针id
+        byte b 接收id
+    @传出 
+        char
+*/
 char ScanKeyMap(byte a,byte b){
   if (a>b) {
     byte c=a;
@@ -55,6 +66,13 @@ char ScanKeyMap(byte a,byte b){
   return 0;
 }
 
+/*
+    @函数 ScanPin
+    @作用 使能某个引脚作用为探针，并对接收脚进行扫描
+    @传入
+        int KBPinMapNum 探针引脚
+    @传出 -
+*/
 void ScanPin(int KBPinMapNum) {
   //设置所有引脚为输入模式
   AllPinIN();
@@ -73,24 +91,51 @@ void ScanPin(int KBPinMapNum) {
   }
 }
 
+
+
+/*
+    @函数 ClearKBScan
+    @作用 清除接收引脚状态表
+    @传入 -
+    @传出 -
+*/
+void ClearKBScan() {
+  memset(KBScan,0,sizeof(KBScan) / sizeof(KBScan[0]));
+  /*
+  for (int i = 0; i < sizeof(KBScan) / sizeof(KBScan[0]); i++)
+    KBScan[i] = 0;
+    */
+}
+
+/*
+    @函数 AllPinOut
+    @作用 全部引脚IO设置为输出模式
+    @传入 -
+    @传出 -
+*/
 void AllPinOut() {
   for (int i = 0; i < sizeof(KBPinMap) / sizeof(KBPinMap[0]); i++) {
     pinMode(KBPinMap[i], OUTPUT);
     digitalWrite(KBPinMap[i], HIGH);
   }
 }
-
-void ClearKBScan() {
-  //memset(KBScan,0,sizeof(KBScan) / sizeof(KBScan[0]));
-  for (int i = 0; i < sizeof(KBScan) / sizeof(KBScan[0]); i++)
-    KBScan[i] = 0;
-}
-
+/*
+    @函数 AllPinIN
+    @作用 全部引脚IO设置为输入模式
+    @传入 -
+    @传出 -
+*/
 void AllPinIN() {
   for (int i = 0; i < sizeof(KBPinMap) / sizeof(KBPinMap[0]); i++)
     pinMode(KBPinMap[i], INPUT_PULLDOWN);
 }
 
+/*
+    @函数 SerialPrintAllKBScan
+    @作用 串口输出 引脚状态表
+    @传入 -
+    @传出 -
+*/
 void SerialPrintAllKBScan() {
   char printBuffer[50];
   for (int i = 0; i < sizeof(KBPinMap) / sizeof(KBPinMap[0]); i++) {
@@ -136,7 +181,6 @@ void setup() {
   Serial1.println("                           ,[[[|OOOOO@@@@@@@@@@@@@@@@@@@@@@@OOOOOO|[`                                  ");
 
   AllPinIN();
-  //AllPinOut();
 }
 
 void loop() {
