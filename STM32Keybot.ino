@@ -1,7 +1,59 @@
+#define SWAP(x, y) \
+	(y) = (x) + (y); \
+	(x) = (y) - (x); \
+	(y) = (y) - (x);
+
+byte KeyMap[][3]={
+  {5,19,'1'},
+  {5,18,'2'},
+  {6,19,'3'},
+  {8,19,'6'},
+  {8,18,'7'},
+  {9,19,'8'},
+  {5,17,'q'},
+  {5,20,'w'},
+  {6,18,'e'},
+  {8,17,'y'},
+  {9,17,'u'},
+  {9,18,'i'},
+  {10,20,'o'},
+  {5,21,'a'},
+  {6,20,'s'},
+  {6,17,'d'},
+  {8,20,'h'},
+  {9,20,'j'},
+  {9,21,'k'},
+  {10,21,'l'},
+  {5,22,'z'},
+  {6,21,'x'},
+  {6,22,'c'},
+  {8,22,'b'},
+  {8,21,'n'},
+  {9,22,'m'},
+  {10,22,'<'},
+  {11,22,'>'},
+  {11,21,'/'},
+};
+
 //
 //                 0     1     2     3     4    5    6   7    8    9    10    11    12   13   14   15   16   17    18    19   20   21   22   23
-int KBPinMap[] = {PB12, PB13, PB14, PB15, PA8, PA4, PA3, PA2, PA1, PA0, PC15, PC14, PB5, PB6, PB7, PB8, PB9, PB11, PB10, PB0, PB1, PA7, PA6, PA5};
+int KBPinMap[] = {PB12, PB13, PB14, PB15, PC13, PA4, PA3, PA2, PA1, PA0, PC15, PC14, PB5, PB6, PB7, PB8, PB9, PB11, PB10, PB0, PB1, PA7, PA6, PA5};
 int KBScan[24] = {0};
+
+char ScanKeyMap(byte a,byte b){
+  if (a>b) {
+    byte c=a;
+    a=b;
+    b=c;
+  }
+  for (int i=0;i<sizeof(KeyMap)/sizeof(KeyMap[0]);i++) {
+    if (KeyMap[i][0]==a&&KeyMap[i][1]==b) return KeyMap[i][2];
+  }
+  char printBuffer[50];
+  sprintf(printBuffer, "--- error a:%d b:%d ---",a,b);
+  Serial1.print(printBuffer);
+  return 0;
+}
 
 void ScanPin(int KBPinMapNum) {
   //设置所有引脚为输入模式
@@ -13,9 +65,9 @@ void ScanPin(int KBPinMapNum) {
   char printBuffer[50];
   for (int i = 0; i < sizeof(KBPinMap) / sizeof(KBPinMap[0]); i++) {
     if (i == KBPinMapNum) continue; //跳过探针引脚
-    if (digitalRead(KBPinMap[i])) {
-      KBScan[i] = 1;
-      sprintf(printBuffer, "探针[%d]:%d  ->  接收[%d]:%d", KBPinMapNum, KBPinMap[KBPinMapNum], i, KBScan[i]);
+    if (analogRead(KBPinMap[i])>2000) {
+      KBScan[i] = 1;  
+      sprintf(printBuffer, "%c # 探针[%d]:%d  ->  接收[%d]:%d",ScanKeyMap(KBPinMapNum,i), KBPinMapNum, KBPinMap[KBPinMapNum], i, KBScan[i]);
       Serial1.println(printBuffer);
     }
   }
